@@ -8,11 +8,13 @@ import (
 type UserType string
 
 const (
-	UserTypePlatformOwner   UserType = "platform_owner"   // 平台老板
-	UserTypeShopOwner       UserType = "shop_owner"       // 店长
-	UserTypeShopEmployee    UserType = "shop_employee"    // 门店员工
-	UserTypeCustomerService UserType = "customer_service" // 客服
-	UserTypeFactory         UserType = "factory"          // 工厂
+	UserTypeAdmin                  UserType = "admin"                    // 管理员
+	UserTypePlatformOwner          UserType = "platform_owner"           // 平台老板
+	UserTypeShopOwner              UserType = "shop_owner"               // 店长
+	UserTypeShopEmployee           UserType = "shop_employee"            // 门店员工
+	UserTypeCustomerServiceManager UserType = "customer_service_manager" // 客服主管
+	UserTypeCustomerService        UserType = "customer_service"         // 客服
+	UserTypeFactory                UserType = "factory"                  // 工厂
 )
 
 type User struct {

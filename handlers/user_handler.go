@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -19,7 +20,7 @@ func ShowUserPage(c *gin.Context) {
 		// 处理错误
 		c.HTML(http.StatusOK, "user.html", gin.H{
 			"CurrentPath": c.Request.URL.Path,
-			"err":         err.Error(),
+			"error":       err.Error(),
 			"users":       []models.User{},
 		})
 		return
@@ -28,5 +29,37 @@ func ShowUserPage(c *gin.Context) {
 		"CurrentPath": c.Request.URL.Path,
 		"user":        user,
 		"users":       users,
+	})
+}
+
+func CreateUser(c *gin.Context) {
+	// userInterface, _ := c.Get("user")
+	// user := userInterface.(models.User)
+	// db := global.DB
+
+	// if user.UserType != "admin" {
+	// 	c.JSON(http.StatusOK, gin.H{
+	// 		"error": "当前用户不是管理员",
+	// 	})
+	// 	return
+	// }
+
+	type CreateRequest struct {
+		Phone    string `form:"phone" binding:"required,len=11"`
+		Name     string `form:"name" binding:"required"`
+		Password string `form:"password" binding:"required,min=6,max=20"`
+		UserType string `form:"userType" binding:"required"`
+	}
+	var req CreateRequest
+	if err := c.ShouldBind(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "参数错误: " + err.Error(),
+		})
+		return
+	}
+	fmt.Println(req)
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "创建成功",
 	})
 }

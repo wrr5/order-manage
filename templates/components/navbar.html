@@ -34,7 +34,7 @@
         </button>
         <div class="collapse navbar-collapse" id="mobileNavbar">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                {{if .user.UserType}}
+
                 <li class="nav-item">
                     <a class="nav-link {{ if eq .CurrentPath "/users" }}active{{ end }}"
                         href="/users">
@@ -42,14 +42,15 @@
                         用户管理
                     </a>
                 </li>
-                {{end}}
-                <li class="nav-item">
-                    <a class="nav-link {{ if eq .CurrentPath "/service-staffs" }}active{{ end }}"
-                        href="/service-staffs">
+
+                <!-- <li class="nav-item">
+                    <a class="nav-link {{ if eq .CurrentPath "/customer-service" }}active{{ end }}"
+                        href="/customer-service">
                         <i class="bi bi-tags me-2"></i>
                         客服管理
                     </a>
-                </li>
+                </li> -->
+                
                 <li class="nav-item">
                     <a class="nav-link {{ if eq .CurrentPath "/informs" }}active{{ end }}" 
                         href="/informs">
@@ -88,6 +89,12 @@
                 用户管理
             </a>
         </li>
+        <!-- <li>
+            <a href="/customer-service" class="nav-link text-white {{ if eq .CurrentPath "/customer-service" }}active{{ end }}">
+                <i class="bi bi-tags me-2"></i>
+                客服管理
+            </a>
+        </li> -->
         <li>
             <a href="/informs" class="nav-link text-white {{ if eq .CurrentPath "/informs" }}active{{ end }}">
                 <i class="bi bi-people me-2"></i>

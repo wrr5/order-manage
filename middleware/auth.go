@@ -40,6 +40,13 @@ func RequireAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 尝试从 Cookie 获取 token
 		token, err := c.Cookie("auth_token")
+		// 从Authorization Header获取
+		// authHeader := c.GetHeader("Authorization")
+		// if authHeader == "" {
+		// 	c.JSON(401, gin.H{"error": "未提供认证信息"})
+		// 	return
+		// }
+
 		if err != nil || len(token) <= 7 {
 			// 没有token或token格式不对，跳转到登录页
 			c.Redirect(http.StatusFound, "/auth/login")

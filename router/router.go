@@ -42,10 +42,11 @@ func setAuthRoutes(r *gin.Engine) {
 }
 
 func setUserRoutes(r *gin.Engine) {
-	inform := r.Group("/users")
-	inform.Use(middleware.RequireAuth())
+	user := r.Group("/users")
+	user.Use(middleware.RequireAuth())
 	{
-		inform.GET("", handlers.ShowUserPage)
+		user.GET("", handlers.ShowUserPage)
+		user.POST("", handlers.CreateUser)
 	}
 }
 

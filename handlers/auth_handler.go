@@ -67,11 +67,13 @@ func Login(c *gin.Context) {
 	}
 	// 设置 HTTP-only Cookie
 	c.SetCookie("auth_token", "Bearer "+token, 3600*72, "/", "", false, true)
-	// c.JSON(http.StatusOK, gin.H{
-	// 	"success": true,
-	// 	"message": "登录成功！",
-	// })
-	c.Redirect(http.StatusFound, "/")
+	c.JSON(http.StatusOK, gin.H{
+		"success":       true,
+		"message":       "登录成功",
+		"authorization": "Bearer " + token,
+		"user":          user,
+	})
+	// c.Redirect(http.StatusFound, "/")
 }
 
 func Logout(c *gin.Context) {
@@ -79,7 +81,10 @@ func Logout(c *gin.Context) {
 	c.SetCookie("auth_token", "", -1, "/", "", false, true)
 
 	// 返回成功信息或重定向到登录页
-	// c.JSON(http.StatusOK, gin.H{"message": "退出成功"})
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"success": true,
+	// 	"message": "退出成功",
+	// })
 	c.Redirect(http.StatusFound, "/auth/login")
 }
 
@@ -102,7 +107,7 @@ func Register(c *gin.Context) {
 		return
 	}
 	var apiReq services.ApiResponse
-	if ok, apiResponse, err := services.ValidatePhone(req.Phone, req.Name); !ok {
+	if ok, apiResponse, err := services.ValidatePhoneName(req.Phone, req.Name); !ok {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
