@@ -20,7 +20,7 @@ func InitDB() *gorm.DB {
 	}
 
 	// 自动迁移（如果表不存在则创建, 已存在则检查有无新增字段，不会修改字段名和删除字段）
-	err := db.AutoMigrate(&models.User{}, &models.Inform{}, &models.InformRead{}, &models.Shop{})
+	err := db.AutoMigrate(&models.User{}, &models.Store{})
 	if err != nil {
 		log.Fatal("数据库迁移失败:", err)
 	}

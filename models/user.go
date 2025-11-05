@@ -21,7 +21,7 @@ type User struct {
 	gorm.Model
 
 	Phone    string   `gorm:"type:varchar(11);uniqueIndex;not null" json:"phone"`
-	Name     string   `gorm:"type:varchar(20);not null" json:"name"`
+	RealName string   `gorm:"type:varchar(20);not null" json:"RealName"`
 	Password string   `gorm:"type:varchar(255);default:null" json:"-"`
 	UserType UserType `gorm:"type:varchar(20);not null" json:"user_type" binding:"required"`
 	Level    uint     `gorm:"type:tinyint;default:null" json:"level"`
@@ -31,12 +31,10 @@ type User struct {
 	PlatformOwner   *User `gorm:"foreignKey:PlatformOwnerID;constraint:OnDelete:SET NULL" json:"platform_owner,omitempty"`
 
 	// 店铺关联 - 多对一
-	ShopID *uint `gorm:"index;default:null" json:"shop_id"`
-	Shop   *Shop `gorm:"foreignKey:ShopID;constraint:OnDelete:SET NULL" json:"shop,omitempty"`
+	StoreID *uint  `gorm:"index;default:null" json:"store_id"`
+	Store   *Store `gorm:"foreignKey:StoreID;constraint:OnDelete:SET NULL" json:"store,omitempty"`
 
 	// 客服关联 - 多对一
 	CustomerServiceID *uint `gorm:"index;default:null" json:"customer_service_id"`
 	CustomerService   *User `gorm:"foreignKey:CustomerServiceID;constraint:OnDelete:SET NULL" json:"customer_service,omitempty"`
-
-	InformReads []InformRead `gorm:"foreignKey:UserID" json:"inform_reads,omitempty"`
 }

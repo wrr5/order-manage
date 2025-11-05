@@ -45,10 +45,10 @@ func CreateUser(c *gin.Context) {
 	// }
 
 	type CreateRequest struct {
-		Phone    string `form:"phone" binding:"required,len=11"`
-		Name     string `form:"name" binding:"required"`
-		Password string `form:"password" binding:"required,min=6,max=20"`
-		UserType string `form:"userType" binding:"required"`
+		Phone    string `form:"phone" json:"phone" binding:"required,len=11"`
+		Name     string `form:"name" json:"name" binding:"required"`
+		Password string `form:"password" json:"password" binding:"required,min=6,max=20"`
+		UserType string `form:"userType" json:"userType" binding:"required"`
 	}
 	var req CreateRequest
 	if err := c.ShouldBind(&req); err != nil {

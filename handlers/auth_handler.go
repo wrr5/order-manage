@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/wrr5/general-management/global"
@@ -95,7 +96,7 @@ func ShowRegister(c *gin.Context) {
 func Register(c *gin.Context) {
 	type RegisterRequest struct {
 		Phone    string `form:"phone" binding:"required,len=11"`
-		Name     string `form:"name" binding:"required"`
+		RealName string `form:"name" binding:"required"`
 		Password string `form:"password" binding:"required,min=6,max=20"`
 	}
 	db := global.DB
@@ -107,7 +108,7 @@ func Register(c *gin.Context) {
 		return
 	}
 	var apiReq services.ApiResponse
-	if ok, apiResponse, err := services.ValidatePhoneName(req.Phone, req.Name); !ok {
+	if ok, apiResponse, err := services.ValidatePhoneName(req.Phone, req.RealName); !ok {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
@@ -129,7 +130,7 @@ func Register(c *gin.Context) {
 	// 转换请求为User模型
 	var user models.User
 	user.Phone = req.Phone
-	user.Name = req.Name
+	user.RealName = req.RealName
 	switch apiReq.DataObj.Records[0].Level {
 	case 1:
 		user.UserType = models.UserTypeShopEmployee
@@ -139,7 +140,7 @@ func Register(c *gin.Context) {
 		result := db.Where("phone = ?", apiReq.DataObj.Records[0].SupPhone).
 			FirstOrCreate(&platformOwner, models.User{
 				Phone:    apiReq.DataObj.Records[0].SupPhone,
-				Name:     apiReq.DataObj.Records[0].SupName,
+				RealName: apiReq.DataObj.Records[0].SupName,
 				UserType: models.UserTypePlatformOwner,
 				Level:    3,
 			})
@@ -160,7 +161,7 @@ func Register(c *gin.Context) {
 		result := db.Where("phone = ?", apiReq.DataObj.Records[0].ParentPhone).
 			FirstOrCreate(&platformOwner, models.User{
 				Phone:    apiReq.DataObj.Records[0].ParentPhone,
-				Name:     apiReq.DataObj.Records[0].ParentName,
+				RealName: apiReq.DataObj.Records[0].ParentName,
 				UserType: models.UserTypePlatformOwner,
 				Level:    3,
 			})
@@ -181,9 +182,10 @@ func Register(c *gin.Context) {
 	}
 
 	// 保存门店信息
-	var shop models.Shop
+	var store models.Store
 	result := db.Where("name = ?", apiReq.DataObj.Records[0].StoreName).
-		FirstOrCreate(&shop, models.Shop{
+		FirstOrCreate(&store, models.Store{
+			StoreId: strconv.FormatInt(apiReq.DataObj.Records[0].StoreID, 10),
 			Name:    *apiReq.DataObj.Records[0].StoreName,
 			Address: *apiReq.DataObj.Records[0].StoreAddress,
 		})
@@ -193,7 +195,7 @@ func Register(c *gin.Context) {
 		})
 		return
 	} else {
-		user.ShopID = &shop.ID
+		user.StoreID = &store.ID
 	}
 
 	// 加密密码
