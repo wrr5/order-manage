@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+</head>
+<body>
+    <b>登录接口
+        <br>
+        POST http://192.168.0.40:8080/api/login
+        <br><br>
+        请求示例
+        <br>
+        {
+            "phone_mumber": "18031938773",
+            "real_name": "杨依",
+            "user_type": "2",
+            "period_zbid": "1536636585"
+            "password": "123456"
+        }
+        <br>
+        user_type(1客服, 2门店员工, 3工厂员工)。门店员工登录时不需要传password，其他用户登录时不需要传real_name和user_type。
+        <br><br>
+        响应示例
+        <br>
+        {
+            "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOjEsIlBob25lIjoiMTgwMzE5Mzg3NzMiLCJleHAiOjE3NjMyNzQ4ODUsImlhdCI6MTc2MzAxNTY4NX0.9x-8qeV4LGrYrZsOXQ5okxFZt0bvb-OuD5skyQDmXto",
+            "message": "登录成功",
+            "success": true,
+            "user": {
+                "UserID": 1,
+                "UserType": 0,
+                "RealName": "杨依",
+                "PhoneNumber": "18031938773",
+                "Password": "",
+                "VzStoreID": "328961",
+                "VzFactoryID": null,
+                "PeriodZbid": "1536636585",
+                "CreatedTime": "2025-11-13T14:14:51+08:00",
+                "UpdatedTime": "2025-11-13T14:34:45.588+08:00",
+                "Zb": {
+                    "ZbID": "",
+                    "ZbName": ""
+                }
+            }
+        }
+    </b>
+    <br><br><br><br>
+    <b>创建用户接口
+        <br>
+        POST http://127.0.0.1:8080/api/users
+        <br><br>
+        请求示例
+        <br>
+        {
+            "phone_mumber": "13288886666",
+            "real_name": "张三丰",
+            "user_type": "1",
+            "period_zbid": "1536636585",
+            "password": "123456",
+            "vz_store_id": "",
+            "vz_factory_id": ""
+        }
+        <br>
+        user_type(1客服, 2门店员工, 3工厂员工), 如果是门店员工则会调用微赞接口验证信息有效性。vz_store_id与vz_factory_id为外键, 可选参数, 其他必填。
+        <br><br>
+        响应示例
+        <br>
+        {
+            "message": "创建用户成功",
+            "success": true,
+            "user": {
+                "UserID": 5,
+                "UserType": 1,
+                "RealName": "张三丰",
+                "PhoneNumber": "13288886666",
+                "Password": "$2a$10$6updf3aaZh/KRFivk36GsOJK87/CWk5hvN4HUlY0ysvmPZ95KbvY.",
+                "VzStoreID": null,
+                "VzFactoryID": null,
+                "PeriodZbid": "1536636585",
+                "CreatedTime": "2025-11-13T15:44:52.843+08:00",
+                "UpdatedTime": "2025-11-13T15:44:52.843+08:00",
+                "Store": {
+                    "VzStoreID": "",
+                    "StoreName": "",
+                    "Address": "",
+                    "Receiver": "",
+                    "ContactPhone": "",
+                    "CreatedTime": "0001-01-01T00:00:00Z",
+                    "UpdatedTime": "0001-01-01T00:00:00Z",
+                    "Status": 0
+                },
+                "Zb": {
+                    "ZbID": "",
+                    "ZbName": ""
+                }
+            }
+        }
+    </b>
+    <br><br><br><br>
+    <b>查询用户接口
+        <br>
+        GET http://127.0.0.1:8080/api/users
+        <br><br>
+        请求示例
+        <br>
+        查询所有用户 
+        http://127.0.0.1:8080/api/users
+        <br>
+        查询指定类型用户
+        http://127.0.0.1:8080/api/users?user_type=1
+        <br>
+        需要携带authorization请求头, user_type(1客服, 2门店员工, 3工厂员工), 可选参数, 查询指定类型的所有用户, 不传则查询所有类型的用户。
+        <br><br>
+        响应示例
+        <br>
+        {
+            "data": [
+                {
+                    "UserID": 3,
+                    "UserType": 1,
+                    "RealName": "张三",
+                    "PhoneNumber": "13566667890",
+                    "Password": "$2a$10$o8TUz0moy0HdCmE4R36rY.xbn/xj7.yanHX9DLAysi3uUk1/eJ9Fi",
+                    "VzStoreID": null,
+                    "VzFactoryID": null,
+                    "PeriodZbid": "1536636585",
+                    "CreatedTime": "2025-11-13T15:38:49+08:00",
+                    "UpdatedTime": "2025-11-13T15:38:49+08:00",
+                    "Store": {
+                        "VzStoreID": "",
+                        "StoreName": "",
+                        "Address": "",
+                        "Receiver": "",
+                        "ContactPhone": "",
+                        "CreatedTime": "0001-01-01T00:00:00Z",
+                        "UpdatedTime": "0001-01-01T00:00:00Z",
+                        "Status": 0
+                    },
+                    "Zb": {
+                        "ZbID": "",
+                        "ZbName": ""
+                    }
+                },
+                {
+                    "UserID": 5,
+                    "UserType": 1,
+                    "RealName": "张三丰",
+                    "PhoneNumber": "13288886666",
+                    "Password": "$2a$10$6updf3aaZh/KRFivk36GsOJK87/CWk5hvN4HUlY0ysvmPZ95KbvY.",
+                    "VzStoreID": null,
+                    "VzFactoryID": null,
+                    "PeriodZbid": "1536636585",
+                    "CreatedTime": "2025-11-13T15:44:53+08:00",
+                    "UpdatedTime": "2025-11-13T15:44:53+08:00",
+                    "Store": {
+                        "VzStoreID": "",
+                        "StoreName": "",
+                        "Address": "",
+                        "Receiver": "",
+                        "ContactPhone": "",
+                        "CreatedTime": "0001-01-01T00:00:00Z",
+                        "UpdatedTime": "0001-01-01T00:00:00Z",
+                        "Status": 0
+                    },
+                    "Zb": {
+                        "ZbID": "",
+                        "ZbName": ""
+                    }
+                },
+                {
+                    "UserID": 6,
+                    "UserType": 2,
+                    "RealName": "杨依",
+                    "PhoneNumber": "18031938773",
+                    "Password": "",
+                    "VzStoreID": "328961",
+                    "VzFactoryID": null,
+                    "PeriodZbid": "1536636585",
+                    "CreatedTime": "2025-11-13T16:26:43+08:00",
+                    "UpdatedTime": "2025-11-13T16:26:43+08:00",
+                    "Store": {
+                        "VzStoreID": "",
+                        "StoreName": "",
+                        "Address": "",
+                        "Receiver": "",
+                        "ContactPhone": "",
+                        "CreatedTime": "0001-01-01T00:00:00Z",
+                        "UpdatedTime": "0001-01-01T00:00:00Z",
+                        "Status": 0
+                    },
+                    "Zb": {
+                        "ZbID": "",
+                        "ZbName": ""
+                    }
+                }
+            ],
+            "message": "查询用户列表成功",
+            "success": true,
+            "total": 3
+        }
+    </b>
+</body>
+</html>

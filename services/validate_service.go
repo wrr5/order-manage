@@ -87,25 +87,26 @@ type CustomInfo struct {
 	ImgList *string  `json:"imgList"`
 }
 
-// 验证注册信息是否有效
-func ValidatePhoneName(phone, name string) (bool, ApiResponse, error) {
+// 验证登录信息是否有效
+func ValidatePhoneName(phone, name string) (ApiResponse, error) {
 	// 请求url
 	url := "https://live-gw.vzan.com/health/v1/admin/agent/pageAgent"
 	// 构建请求体
 	requestBody := map[string]interface{}{
 		"phone": phone,
+		"name":  name,
 	}
 
 	// 将请求体转换为JSON
 	jsonData, err := json.Marshal(requestBody)
 	if err != nil {
-		return false, ApiResponse{}, fmt.Errorf("JSON编码错误: %v", err)
+		return ApiResponse{}, fmt.Errorf("JSON编码错误: %v", err)
 	}
 
 	// 创建HTTP请求
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {
-		return false, ApiResponse{}, fmt.Errorf("创建请求错误: %v", err)
+		return ApiResponse{}, fmt.Errorf("创建请求错误: %v", err)
 	}
 
 	// 设置请求头
@@ -121,20 +122,20 @@ func ValidatePhoneName(phone, name string) (bool, ApiResponse, error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return false, ApiResponse{}, fmt.Errorf("请求错误: %v", err)
+		return ApiResponse{}, fmt.Errorf("请求错误: %v", err)
 	}
 	defer resp.Body.Close()
 
 	// 读取响应
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return false, ApiResponse{}, fmt.Errorf("读取响应失败: %v", err)
+		return ApiResponse{}, fmt.Errorf("读取响应失败: %v", err)
 	}
 	// 解析响应
 	var apiResponse ApiResponse
 
 	if err := json.Unmarshal(body, &apiResponse); err != nil {
-		return false, ApiResponse{}, fmt.Errorf("解析响应失败: %v", err)
+		return ApiResponse{}, fmt.Errorf("解析响应失败: %v", err)
 	}
 
 	// 根据第三方API的响应逻辑判断注册信息是否有效
@@ -143,16 +144,12 @@ func ValidatePhoneName(phone, name string) (bool, ApiResponse, error) {
 		if apiResponse.Msg != "" {
 			errorMsg = apiResponse.Msg
 		}
-		return false, ApiResponse{}, fmt.Errorf("API请求失败: %s (错误码: %d)", errorMsg, apiResponse.Code)
+		return ApiResponse{}, fmt.Errorf("API请求失败: %s (错误码: %d)", errorMsg, apiResponse.Code)
 	}
 
 	if apiResponse.DataObj.Total < 1 {
-		return false, ApiResponse{}, fmt.Errorf("无效的手机号, 响应数据中未找到记录")
+		return ApiResponse{}, fmt.Errorf("无效用户信息")
 	}
 
-	if apiResponse.DataObj.Records[0].Name != name {
-		return false, ApiResponse{}, fmt.Errorf("姓名与手机号不匹配")
-	}
-
-	return true, apiResponse, nil
+	return apiResponse, nil
 }

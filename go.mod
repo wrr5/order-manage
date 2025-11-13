@@ -1,4 +1,4 @@
-module github.com/wrr5/general-management
+module github.com/wrr5/order-manage
 
 go 1.25.3
 

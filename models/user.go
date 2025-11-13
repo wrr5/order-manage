@@ -1,40 +1,36 @@
 package models
 
 import (
-	"gorm.io/gorm"
+	"time"
 )
 
-// UserType 用户类型枚举
-type UserType string
-
-const (
-	UserTypeAdmin                  UserType = "admin"                    // 管理员
-	UserTypePlatformOwner          UserType = "platform_owner"           // 平台老板
-	UserTypeShopOwner              UserType = "shop_owner"               // 店长
-	UserTypeShopEmployee           UserType = "shop_employee"            // 门店员工
-	UserTypeCustomerServiceManager UserType = "customer_service_manager" // 客服主管
-	UserTypeCustomerService        UserType = "customer_service"         // 客服
-	UserTypeFactory                UserType = "factory"                  // 工厂
-)
-
+// User 用户表模型
 type User struct {
-	gorm.Model
+	UserID      int       `gorm:"primaryKey;column:user_id;autoIncrement;comment:用户ID"`
+	UserType    int8      `gorm:"column:user_type;not null;comment:用户类型（1客服，2门店员工，3工厂员工）"`
+	RealName    string    `gorm:"column:real_name;type:varchar(50);not null;comment:真实姓名"`
+	PhoneNumber string    `gorm:"column:phone_number;type:varchar(20);not null;uniqueIndex:phone_number;index:idx_phone;comment:手机号"`
+	Password    string    `gorm:"column:password;type:varchar(255);not null;comment:密码"`
+	VzStoreID   *string   `gorm:"column:vz_store_id;type:varchar(50);index:idx_store;comment:门店ID"`
+	VzFactoryID *string   `gorm:"column:vz_factory_id;type:varchar(50);index:idx_factory;comment:工厂ID"`
+	PeriodZbid  *string   `gorm:"column:period_zbid;type:varchar(100);comment:期数"`
+	CreatedTime time.Time `gorm:"column:created_time;autoCreateTime;comment:创建时间"`
+	UpdatedTime time.Time `gorm:"column:updated_time;autoUpdateTime;comment:更新时间"`
 
-	Phone    string   `gorm:"type:varchar(11);uniqueIndex;not null" json:"phone"`
-	RealName string   `gorm:"type:varchar(20);not null" json:"RealName"`
-	Password string   `gorm:"type:varchar(255);default:null" json:"-"`
-	UserType UserType `gorm:"type:varchar(20);not null" json:"user_type" binding:"required"`
-	Level    uint     `gorm:"type:tinyint;default:null" json:"level"`
-
-	// 平台老板关联 - 多对一
-	PlatformOwnerID *uint `gorm:"index;default:null" json:"platform_owner_id"`
-	PlatformOwner   *User `gorm:"foreignKey:PlatformOwnerID;constraint:OnDelete:SET NULL" json:"platform_owner,omitempty"`
-
-	// 店铺关联 - 多对一
-	StoreID *uint  `gorm:"index;default:null" json:"store_id"`
-	Store   *Store `gorm:"foreignKey:StoreID;constraint:OnDelete:SET NULL" json:"store,omitempty"`
-
-	// 客服关联 - 多对一
-	CustomerServiceID *uint `gorm:"index;default:null" json:"customer_service_id"`
-	CustomerService   *User `gorm:"foreignKey:CustomerServiceID;constraint:OnDelete:SET NULL" json:"customer_service,omitempty"`
+	// 关联关系（可选，根据实际需要添加）
+	Store Store `gorm:"foreignKey:VzStoreID;references:VzStoreID"`
+	// Factory Factory `gorm:"foreignKey:VzFactoryID;references:VzFactoryID"`
+	Zb Zb `gorm:"foreignKey:PeriodZbid;references:ZbID"`
 }
+
+// TableName 设置表名
+func (User) TableName() string {
+	return "user"
+}
+
+// 用户类型常量
+const (
+	UserTypeCustomerService = 1 // 客服
+	UserTypeStoreEmployee   = 2 // 门店员工
+	UserTypeFactoryEmployee = 3 // 工厂员工
+)

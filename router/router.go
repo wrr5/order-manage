@@ -2,58 +2,62 @@ package router
 
 import (
 	"html/template"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/wrr5/general-management/handlers"
-	"github.com/wrr5/general-management/middleware"
+	"github.com/wrr5/order-manage/handlers"
+	"github.com/wrr5/order-manage/middleware"
 )
 
 // SetupRouter 配置所有路由
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
-	r.Use(middleware.GetUserMiddleware())
 
 	// 添加模板函数
 	r.SetFuncMap(template.FuncMap{})
 
-	// 注册文章相关路由
-	setAuthRoutes(r)
-	setUserRoutes(r)
-	setInformRoutes(r)
-	// 根路径跳转
-	r.GET("/", middleware.RequireAuth(), handlers.ShowIndex)
-	// 404处理
+	// 创建 API 路由组
+	api := r.Group("/api")
+	{
+		// 设置认证路由
+		setAuthRoutes(api)
+		// 设置用户路由
+		setUserRoutes(api)
+	}
+
+	// 404 处理
 	r.NoRoute(func(c *gin.Context) {
-		c.HTML(404, "notfound.html", gin.H{"error": "页面不存在"})
+		c.JSON(404, gin.H{"error": "页面不存在"})
 	})
+	r.GET("/", func(c *gin.Context) { c.HTML(http.StatusOK, "index.html", gin.H{}) })
 
 	return r
 }
 
-func setAuthRoutes(r *gin.Engine) {
-	auth := r.Group("/auth")
-	{
-		auth.GET("/login", handlers.ShowLogin)
-		auth.POST("/login", handlers.Login)
-		auth.GET("/logout", handlers.Logout)
-		auth.GET("/register", handlers.ShowRegister)
-		auth.POST("/register", handlers.Register)
-	}
+func setAuthRoutes(r *gin.RouterGroup) {
+
+	r.POST("/login", handlers.Login)
+
 }
 
-func setUserRoutes(r *gin.Engine) {
+func setUserRoutes(r *gin.RouterGroup) {
 	user := r.Group("/users")
-	user.Use(middleware.RequireAuth())
 	{
-		user.GET("", handlers.ShowUserPage)
+		// 创建用户
 		user.POST("", handlers.CreateUser)
-	}
-}
-
-func setInformRoutes(r *gin.Engine) {
-	inform := r.Group("/informs")
-	inform.Use(middleware.RequireAuth())
-	{
-		inform.GET("", handlers.ShowInformPage)
+		// 获取用户列表（带分页和筛选）
+		user.GET("", middleware.RequireAuth(), handlers.GetUsers)
+		// 获取单个用户详情
+		user.GET("/:id", handlers.GetUser)
+		// 更新用户信息
+		// user.PUT("/:id", handlers.UpdateUser)
+		// 部分更新用户信息
+		// user.PATCH("/:id", handlers.PartialUpdateUser)
+		// 删除用户
+		// user.DELETE("/:id", handlers.DeleteUser)
+		// 获取当前登录用户信息
+		// user.GET("/me", handlers.GetCurrentUser)
+		// 更新当前用户密码
+		// user.PUT("/me/password", handlers.UpdatePassword)
 	}
 }
