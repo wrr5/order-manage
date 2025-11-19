@@ -360,12 +360,11 @@ func GetLogisticsByNo(c *gin.Context) {
 	for _, trackingNum := range trackingNumbers {
 		logisticsResponse, err := services.QueryDelivery(strings.TrimSpace(trackingNum))
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
+			respExpress = append(respExpress, services.LogisticsInfo{LogisticCode: strings.TrimSpace(trackingNum)})
+		} else {
+			respExpress = append(respExpress, logisticsResponse.DataObj.LogisticsInfo)
 		}
-		respExpress = append(respExpress, logisticsResponse.DataObj.LogisticsInfo)
+
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
