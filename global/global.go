@@ -19,11 +19,6 @@ var (
 	TM = &TokenManager{}
 )
 
-// Init 初始化token管理器
-func (tm *TokenManager) Init() {
-	tm.refresh()
-}
-
 // refresh 刷新token
 func (tm *TokenManager) refresh() {
 	token := GetToken() // 调用你的GetToken函数
@@ -48,31 +43,21 @@ func (tm *TokenManager) Get() string {
 func (tm *TokenManager) ShouldRefresh() bool {
 	tm.lock.RLock()
 	defer tm.lock.RUnlock()
-	return tm.token == "" || time.Since(tm.lastUpdate) > 24*time.Hour
+	return tm.token == "" || time.Since(tm.lastUpdate) > 8*time.Hour
 }
 
-// StartAutoRefresh 启动自动刷新
+// StartAutoRefresh 启动自动刷新（包含初始化）
 func (tm *TokenManager) StartAutoRefresh() {
-	// 立即检查并刷新一次
-	if tm.ShouldRefresh() {
-		tm.refresh()
-	}
+	// 启动时立即刷新一次（初始化）
+	tm.refresh()
 
-	// 每天固定时间刷新（凌晨0:05）
+	// 每8小时刷新一次
 	go func() {
-		for {
-			now := time.Now()
-			// 计算今天凌晨0:05
-			today := time.Date(now.Year(), now.Month(), now.Day(), 0, 5, 0, 0, now.Location())
-			if now.After(today) {
-				// 如果已经过了今天0:05，就计算明天0:05
-				today = today.Add(24 * time.Hour)
-			}
-			duration := today.Sub(now)
+		ticker := time.NewTicker(8 * time.Hour)
+		defer ticker.Stop()
 
-			log.Printf("距离下次token刷新还有: %v", duration)
-			time.Sleep(duration)
-
+		for range ticker.C {
+			log.Println("定时刷新token...")
 			tm.refresh()
 		}
 	}()

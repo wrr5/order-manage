@@ -18,7 +18,6 @@ func main() {
 	}
 	tools.InitDB()
 	// 初始化token管理器
-	global.TM.Init()
 	global.TM.StartAutoRefresh()
 
 	r := router.SetupRouter()
