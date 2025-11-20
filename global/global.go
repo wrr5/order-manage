@@ -39,13 +39,6 @@ func (tm *TokenManager) Get() string {
 	return tm.token
 }
 
-// ShouldRefresh 检查是否需要刷新
-func (tm *TokenManager) ShouldRefresh() bool {
-	tm.lock.RLock()
-	defer tm.lock.RUnlock()
-	return tm.token == "" || time.Since(tm.lastUpdate) > 8*time.Hour
-}
-
 // StartAutoRefresh 启动自动刷新（包含初始化）
 func (tm *TokenManager) StartAutoRefresh() {
 	// 启动时立即刷新一次（初始化）
@@ -61,10 +54,4 @@ func (tm *TokenManager) StartAutoRefresh() {
 			tm.refresh()
 		}
 	}()
-}
-
-// ForceRefresh 强制刷新token
-func (tm *TokenManager) ForceRefresh() {
-	log.Println("强制刷新token...")
-	tm.refresh()
 }
