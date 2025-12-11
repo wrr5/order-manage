@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
+	"strings"
 	"time"
 
 	"github.com/wrr5/order-manage/global"
@@ -57,9 +59,22 @@ type ShipperInfo struct {
 	HasDelivery  bool        `json:"hasDelivery"`  // 是否有物流信息
 }
 
+// 壹米滴答物流特殊处理
+func ifyimidida(s string) bool {
+	return len(s) == 12 && strings.HasPrefix(s, "112")
+}
+
 func QueryDelivery(expressNumber string) (LogisticsResponse, error) {
-	url := fmt.Sprintf("https://shop.vzan.com/api/zbdeliveryprocure/getlogistics?storeId=123456&deliveryNo=%s", expressNumber)
-	req, err := http.NewRequest("GET", url, nil)
+	var queryUrl string
+	if ifyimidida(expressNumber) {
+		// 对中文参数值进行URL编码
+		deliveryName := "壹米滴答"
+		encodedDeliveryName := url.QueryEscape(deliveryName)
+		queryUrl = fmt.Sprintf("https://shop.vzan.com/api/zbdeliveryprocure/getlogistics?storeId=123456&deliveryNo=%s&deliveryName=%s", expressNumber, encodedDeliveryName)
+	} else {
+		queryUrl = fmt.Sprintf("https://shop.vzan.com/api/zbdeliveryprocure/getlogistics?storeId=123456&deliveryNo=%s", expressNumber)
+	}
+	req, err := http.NewRequest("GET", queryUrl, nil)
 	if err != nil {
 		return LogisticsResponse{}, fmt.Errorf("创建请求错误: %v", err)
 	}
