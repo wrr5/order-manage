@@ -471,7 +471,7 @@ func UploadDelivery(c *gin.Context) {
 		}
 
 		// 跳过空行
-		if order.DeliveryOrderNo == "" && order.ProductID == "" {
+		if order.DeliveryOrderNo == "" {
 			continue
 		}
 
